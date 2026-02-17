@@ -1,0 +1,27 @@
+Actix-Web Hello World!
+- curl -d "Hello Rust" -X POST http://127.0.0.1:8080/echo
+- curl http://127.0.0.1:8080
+
+Start mysql
+- brew install mysql
+- brew services start mysql
+
+Create MySQL DATABASE
+sqlx database create
+
+sqlx migrate add create_user_table.sql
+sqlx migrate add create_categories.sql
+
+sqlx migrate run
+
+MySQL Connection
++ mysql -uroot -p
++ use moneyflow
++ show tables;
+
+
+Try sign_up
+curl -X POST http://localhost:8080/auth/sign-up -H "Content-Type: application/json" -d '{"email":"test@example.com","password":"password123","firstname":"John","lastname":"Doe"}'
+
+Inserto into users
+INSERT INTO `users` (`email`, `firstname`, `lastname`, `password`) VALUES ('jane@example.com', 'Jane', 'Doe', 'your_hashed_password');
