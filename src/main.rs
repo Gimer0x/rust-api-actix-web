@@ -7,6 +7,7 @@ mod db;
 
 struct AppState {
     db: Mutex<sqlx::MySqlPool>,
+    jwt_secret: String,
 }
 
 #[actix_web::main]
@@ -18,10 +19,11 @@ async fn main() -> std::io::Result<()> {
         .await
         .unwrap()
         ),
+        jwt_secret: std::env::var("JWT_SECRET").unwrap(),
     });
     HttpServer::new(move || {
         App::new()
-            .app_data(Data::clone(&state))
+            .app_data(state.clone())
             .service(controllers::auth::sign_up)
             .service(controllers::auth::sign_in)
             .service(controllers::me::get_profile)
