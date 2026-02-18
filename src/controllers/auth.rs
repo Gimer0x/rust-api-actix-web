@@ -1,12 +1,11 @@
 use std::time::SystemTime;
+
 use actix_web::{post, Responder, web, HttpResponse};
 use jsonwebtoken::{encode, Header, EncodingKey};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
-
-use crate::{db, AppState};
 use bcrypt::verify;
-
+use crate::{db, AppState};
 
 #[derive(Deserialize, Debug)]
 pub struct SignUpRequest {
@@ -47,6 +46,7 @@ pub struct Claims {
     pub role: String,
     pub exp: u64,
 }
+
 #[post("/auth/sign-in")]
 pub async fn sign_in(state: web::Data<AppState>, data: web::Json<SignInRequest>) -> impl Responder {
     let db = state.db.lock().await;
@@ -68,11 +68,10 @@ pub async fn sign_in(state: web::Data<AppState>, data: web::Json<SignInRequest>)
     let claims = Claims {
         sub: user.id,
         role: "user".to_string(),
-        exp: (
-            SystemTime::now()
+        exp: SystemTime::now()
             .duration_since(SystemTime::UNIX_EPOCH)
             .unwrap()
-            .as_secs() + 4 * 60 * 60 ) as u64
+            .as_secs() + 4 * 60 * 60
     };
 
     let token = encode(

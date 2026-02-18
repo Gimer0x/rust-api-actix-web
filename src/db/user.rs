@@ -1,4 +1,6 @@
+use crate::controllers::me::UpdateProfileRequest;
 use crate::controllers::auth::SignUpRequest;
+use serde::Serialize;
 use sqlx::types::chrono;
 use bcrypt::{DEFAULT_COST, hash};
 
@@ -21,12 +23,14 @@ pub async fn create_user(db: &sqlx::MySqlPool, user: SignUpRequest) -> bool {
     .is_ok()
 }
 
+#[derive(Serialize)]
 pub struct User {
     pub id: u64,
     pub email: String,
+    #[serde(skip_serializing)]
+    pub password: String,
     pub firstname: String,
     pub lastname: String,
-    pub password: String,
     pub balance: u64,
     pub created_at: chrono::NaiveDateTime,
     pub updated_at: chrono::NaiveDateTime,
@@ -37,4 +41,21 @@ pub async fn get_user_by_email(db: &sqlx::MySqlPool, email: &str) -> Option<User
         .fetch_optional(db)
         .await
         .unwrap()
+}
+
+pub async fn get_user_by_id(db: &sqlx::MySqlPool, id: u64) -> Option<User> {
+    sqlx::query_as!(User, "SELECT * FROM users WHERE id = ?", id)
+        .fetch_optional(db)
+        .await
+        .unwrap()
+}
+
+pub async fn update_user_by_id(db: &sqlx::MySqlPool, id: u64, user: &UpdateProfileRequest) {
+    sqlx::query!(
+        "UPDATE users SET firstname = ?, lastname = ? WHERE id = ?",
+        &user.firstname, &user.lastname, id
+    )
+    .execute(db)
+    .await
+    .unwrap();
 }

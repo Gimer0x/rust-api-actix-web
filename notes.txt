@@ -25,3 +25,6 @@ curl -X POST http://localhost:8080/auth/sign-up -H "Content-Type: application/js
 
 Inserto into users
 INSERT INTO `users` (`email`, `firstname`, `lastname`, `password`) VALUES ('jane@example.com', 'Jane', 'Doe', 'your_hashed_password');
+
+Initialize watcher:
+cargo watch -x run
