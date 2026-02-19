@@ -2,6 +2,7 @@ use actix_web::{get, post, put, delete, Responder, HttpResponse, web, HttpReques
 use crate::{db, AppState, utils};
 use serde::Deserialize;
 use serde_json::json;
+use crate::utils::{is_credit, is_debit};
 
 #[get("/transactions")]
 pub async fn index(state: web::Data<AppState>, req: HttpRequest) ->impl Responder {
@@ -76,6 +77,7 @@ pub async fn show(state: web::Data<AppState>, req: HttpRequest, path: web::Path<
     let db = state.db.lock().await;
     let user_id = utils::get_user_id(&req);
     let id = path.into_inner();
+    
     let Some(transaction) = db::transactions::get_transaction_by_id(&db, id).await else {
         return HttpResponse::NotFound().json(json!({
             "status": "error",
@@ -151,7 +153,7 @@ pub async fn destroy(state: web::Data<AppState>, req: HttpRequest, path: web::Pa
     
     let category = db::categories::get_category_by_id(&db, transaction.category_id).await.unwrap();
 
-    if transaction.r#type == "CREDIT" 
+    if is_credit(&transaction.r#type) 
         && (transaction.amount > category.balance || transaction.amount > category.balance) {
             return HttpResponse::BadRequest().json(json!({
                 "status": "error",
@@ -161,7 +163,7 @@ pub async fn destroy(state: web::Data<AppState>, req: HttpRequest, path: web::Pa
 
     db::transactions::delete_transaction_by_id(&db, transaction.id).await;
 
-    let user_balance = if transaction.r#type == "DEBIT" {
+    let user_balance = if is_debit(&transaction.r#type) {
         user.balance + transaction.amount
     } else {
         user.balance - transaction.amount
@@ -169,7 +171,7 @@ pub async fn destroy(state: web::Data<AppState>, req: HttpRequest, path: web::Pa
 
     db::user::update_user_balance(&db, user.id, user_balance).await;
 
-    let category_balance = if transaction.r#type == "DEBIT" {
+    let category_balance = if is_debit(&transaction.r#type) {
         category.balance + transaction.amount
     } else {
         category.balance - transaction.amount

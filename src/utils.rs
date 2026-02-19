@@ -12,3 +12,11 @@ pub async fn get_authenticated_user(req: &HttpRequest, db: &sqlx::MySqlPool) -> 
         .await
         .unwrap()
 }
+
+pub fn is_credit(t: &str) -> bool {
+    t == "CREDIT"
+}
+
+pub fn is_debit(t: &str) -> bool {
+    t == "DEBIT"
+}

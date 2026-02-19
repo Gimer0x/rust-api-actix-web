@@ -28,3 +28,33 @@ INSERT INTO `users` (`email`, `firstname`, `lastname`, `password`) VALUES ('jane
 
 Initialize watcher:
 cargo watch -x run
+
+
+DOCKER
+
+docker build -t moneyflow:latest .
+
+Make sure to create a local sqlx:
+cargo sqlx prepare   
+
+Please note that when building the docker image yourself, you'll have to make the following changes:
+
+In main.rs when calling .bind():
+
+Set the host to 0.0.0.0 instead of 127.0.0.1
+
+Set the port to 80 instead of 8080
+
+So, your .bind() call should look like this:
+
+.bind(("0.0.0.0", 80))?
+
+
+Here's the command to run the docker image (replace afaanbilal/moneyflow with the name of your image):
+
+docker run --rm -it -p 8000:80 \
+    -e DATABASE_URL=[DB URL] \
+    -e JWT_SECRET=[RANDOM SECRET] \
+    /moneyflow
+
+Make sure to set the DATABASE_URL and JWT_SECRET environment variables.
