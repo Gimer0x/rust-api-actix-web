@@ -5,6 +5,7 @@ use actix_extensible_rate_limit::{
     RateLimiter,
 };
 use std::time::Duration;
+use actix_cors::Cors;
 
 mod controllers;
 mod db;
@@ -32,10 +33,11 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(move || {
         App::new()
+            .wrap(Cors::permissive())
             .wrap(
                 RateLimiter::builder(
                     rate_limiter_backend.clone(),
-                    SimpleInputFunctionBuilder::new(Duration::from_secs(60), 10)
+                    SimpleInputFunctionBuilder::new(Duration::from_secs(30), 50)
                         .real_ip_key()
                         .build()
                 )

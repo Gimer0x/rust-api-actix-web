@@ -19,6 +19,8 @@ MySQL Connection
 + use moneyflow;
 + show tables;
 
+Add Cors (Cross-origin requests)
+
 
 Try sign_up
 curl -X POST http://localhost:8080/auth/sign-up -H "Content-Type: application/json" -d '{"email":"test@example.com","password":"password123","firstname":"John","lastname":"Doe"}'
