@@ -16,7 +16,7 @@ sqlx migrate run
 
 MySQL Connection
 + mysql -uroot -p
-+ use moneyflow
++ use moneyflow;
 + show tables;
 
 

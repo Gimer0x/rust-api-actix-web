@@ -23,6 +23,7 @@ pub async fn create_user(db: &sqlx::MySqlPool, user: SignUpRequest) -> bool {
     .is_ok()
 }
 
+
 #[derive(Serialize)]
 pub struct User {
     pub id: u64,
@@ -54,6 +55,16 @@ pub async fn update_user_by_id(db: &sqlx::MySqlPool, id: u64, user: &UpdateProfi
     sqlx::query!(
         "UPDATE users SET firstname = ?, lastname = ? WHERE id = ?",
         &user.firstname, &user.lastname, id
+    )
+    .execute(db)
+    .await
+    .unwrap();
+}
+
+pub async fn update_user_balance(db: &sqlx::MySqlPool, id: u64, amount: u64) {
+    sqlx::query!(
+        "UPDATE users SET balance = balance + ? WHERE id = ?",
+        &amount, &id
     )
     .execute(db)
     .await
